@@ -1,0 +1,130 @@
+{
+    "window.zoomLevel": 0,
+    "files.autoSave": "afterDelay",
+    "explorer.confirmDragAndDrop": false,
+    "editor.renderIndentGuides": false,
+    "git.ignoreLegacyWarning": true,
+    "workbench.iconTheme": "vscode-icons", //启用vscode图标
+    "python.pythonPath": "C:\\Users\\93294\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe", // python3路径
+    "editor.lineHeight": 26, // 编辑器中的行高
+    "editor.fontSize": 18, // 编辑器中的字体
+    "editor.wordWrap": "on",
+    "editor.formatOnSave": true, //编辑器自动保存
+    "python.linting.flake8Enabled": true,
+    "python.linting.enabled": false,
+    //启用flake8，首先需要pip3 install flake8
+    "python.formatting.provider": "yapf", ///启用yapf，首先需要pip3 install yapf
+    "path-intellisense.autoSlashAfterDirectory": true,
+    "path-intellisense.extensionOnImport": true, // 配色方案
+    "python.linting.pylintArgs": [
+        "--load-plugins",
+        "pylint_django",
+        "--disable-msg=C0111"
+    ], // 忽略的警告信息
+    // 下面是topper的插入header配置
+    "topper.customTemplateParameters": [
+        {
+            "personalProfile": {
+                "author": "Navi_<",
+                "website": "pornhub.com",
+                "copyright": "None \n None",
+                "license": "None",
+                "email": "Navi@pornhub.com"
+            }
+        },
+        {
+            "officeProfile": {
+                "author": "Navi Hunt",
+                "department": "Product Development",
+                "email": "Navi@pornhub.com"
+            }
+        }
+    ],
+    "topper.headerTemplates": [
+        {
+            "defaultCStyled": {
+                "headerBegin": "/**",
+                "headerPrefix": "*",
+                "headerEnd": "*/",
+                "template": [
+                    "${headerBegin}",
+                    "${headerPrefix} ${fileName}",
+                    "${headerPrefix} @author ${author}",
+                    "${headerPrefix} @description ${description}",
+                    "${headerPrefix} @created ${createdDate}",
+                    "${headerPrefix} @copyright ${copyright}",
+                    "${headerPrefix} @last-modified ${lastModifiedDate}",
+                    "${headerEnd}"
+                ]
+            }
+        },
+        {
+            "python": {
+                "headerBegin": "# -*- coding: utf-8 -*-",
+                "headerPrefix": "#",
+                "headerEnd": "#",
+                "template": [
+                    "${headerBegin}",
+                    "${headerPrefix} ${fileName}",
+                    "${headerPrefix} @author ${author}",
+                    "${headerPrefix} @description ${description}",
+                    "${headerPrefix} @created ${createdDate}",
+                    "${headerPrefix} @last-modified ${lastModifiedDate}",
+                    "${headerEnd}"
+                ]
+            }
+        }
+    ],
+    "editor.fontFamily": "Consolas, 'Courier New', monospace",
+    "terminal.integrated.fontFamily": "DejaVu Sans Mono for Powerline",
+    "editor.fontWeight": "500",
+    "workbench.colorTheme": "Panda Syntax",
+    "code-runner.executorMap": {
+        "javascript": "node",
+        "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+        "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "objective-c": "cd $dir && gcc -framework Cocoa $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "php": "php",
+        "python": "python -u",
+        "perl": "perl",
+        "perl6": "perl6",
+        "ruby": "ruby",
+        "go": "go run",
+        "lua": "lua",
+        "groovy": "groovy",
+        "powershell": "powershell -ExecutionPolicy ByPass -File",
+        "bat": "cmd /c",
+        "shellscript": "bash",
+        "fsharp": "fsi",
+        "csharp": "scriptcs",
+        "vbscript": "cscript //Nologo",
+        "typescript": "ts-node",
+        "coffeescript": "coffee",
+        "scala": "scala",
+        "swift": "swift",
+        "julia": "julia",
+        "crystal": "crystal",
+        "ocaml": "ocaml",
+        "r": "Rscript",
+        "applescript": "osascript",
+        "clojure": "lein exec",
+        "haxe": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
+        "rust": "cd $dir && rustc $fileName && $dir$fileNameWithoutExt",
+        "racket": "racket",
+        "scheme": "csi -script",
+        "ahk": "autohotkey",
+        "autoit": "autoit3",
+        "dart": "dart",
+        "pascal": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+        "d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
+        "haskell": "runhaskell",
+        "nim": "nim compile --verbosity:0 --hints:off --run",
+        "lisp": "sbcl --script",
+        "kit": "kitc --run",
+        "v": "v run",
+        "sass": "sass --style expanded",
+        "scss": "scss --style expanded",
+        "less": "cd $dir && lessc $fileName $fileNameWithoutExt.css"
+    }
+}
