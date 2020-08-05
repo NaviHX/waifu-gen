@@ -11,6 +11,7 @@ from math import log2
 from PIL import Image
 import keras.backend as K
 import matplotlib.pyplot as plt
+import datetime
 
 img_size = 32
 latent_size = 32
@@ -30,10 +31,20 @@ def load_data():
     return np.array(out)
 
 
-def scaling(x, scale, bias):
-    for i in range(batch_size):
-        y[i] = x[i] * scale[i] + bias[i]
-    return y
+class ImageFlow:
+    def __init__(self):
+        self.image_list = os.listdir('./resized_img/')
+        self.amount = len(self.image_list)
+        print('Found {} Pics'.format(self.amount))
+
+    def get(self, batch_size):
+        idx = np.random.randint(0, self.amount, batch_size)
+        out = []
+        for i in idx:
+            img = Image.open(os.getcwd()+'/resized_img/{0}'.format(self.image_list[i])).convert('RGB')
+            data = np.reshape(np.array(img.getdata()), (img_size, img_size, 3))
+            out.append(data)
+        return np.array(out)
 
 
 def AdaIN(img):
@@ -93,10 +104,12 @@ class styleGAN():
                  lr=0.0001,
                  latent_size=latent_size,
                  img_size=img_size,
+                 img_path='./resized_img',
                  log_path=None):
         self.lr = lr
         self.latent_size = latent_size
         self.img_size = img_size
+        self.img_path=img_path
         self.optimizers = RMSprop(lr=0.00005)
         self.log = open(log_path, 'w')
 
@@ -133,16 +146,24 @@ class styleGAN():
         self.g_train_model.compile(optimizer=self.optimizers, loss='mse')
 
     def train(self, epochs, batch_size, sample_interval=100):
-        x_train = load_data()
-        x_train = (x_train.astype(np.float32) - 127.5) / 127.5
+
+        time_start = datetime.datetime.now()
+        print('训练开始时间 : {0}'.format(time_start))
+        self.log.write('Start at : {0}'.format(time_start))
+
+        # x_train = load_data()
+        # x_train = (x_train.astype(np.float32) - 127.5) / 127.5
+
+        x_train=ImageFlow()
 
         real_out = np.ones([batch_size, 1])
         fake_out = np.zeros([batch_size, 1])
         gp_out = np.ones([batch_size, 1])
 
         for epoch in range(epochs):
-            idx = np.random.randint(0, x_train.shape[0], batch_size)
-            data = x_train[idx]
+            # idx = np.random.randint(0, x_train.shape[0], batch_size)
+            # data=x_train[idx]
+            data = x_train.get(batch_size=batch_size)
             z = noise(batch_size=batch_size, latent_size=latent_size)
             d_loss = self.d_train_model.train_on_batch(
                 [data, z], [real_out, fake_out, gp_out])
@@ -154,11 +175,18 @@ class styleGAN():
                 self.log.write(
                     'Epoch {0}\nDiscriminator Loss : {1:.4f}\nGenerator Loss : {2:.4f}'
                     .format(epoch, d_loss[0], g_loss))
+                self.log.flush()
                 sample_img = self.generator.predict(
                     noise(batch_size=1, latent_size=latent_size))
                 self.gen_sample_image(epoch)
-                self.discriminator.save(
-                    './model/discriminator{0}.h5'.format(epoch))
+                self.discriminator.save('./model/discriminator.h5')
+                self.generator.save('./model/generator.h5')
+
+        time_end = datetime.datetime.now()
+        print('训练结束时间 : {0}'.format(time_end))
+        print('训练耗时 : {0}'.format(time_end - time_start))
+        self.log.write('End at : {0}\nTime cost : {1}'.format(time_end -
+                                                              time_start))
 
     def build_generator(self):
         latent_input = Input(shape=[self.latent_size])
@@ -168,16 +196,6 @@ class styleGAN():
         latent = LeakyReLU(alpha=0.2)(latent)
         latent = Dense(64)(latent)
         latent = LeakyReLU(alpha=0.2)(latent)
-        # latent = Dense(64)(latent)
-        # latent = LeakyReLU(alpha=0.2)(latent)
-        # latent = Dense(64)(latent)
-        # latent = LeakyReLU(alpha=0.2)(latent)
-        # latent = Dense(64)(latent)
-        # latent = LeakyReLU(alpha=0.2)(latent)
-        # latent = Dense(64)(latent)
-        # latent = LeakyReLU(alpha=0.2)(latent)
-        # latent = Dense(64)(latent)
-        # latent = LeakyReLU(alpha=0.2)(latent)
         out = Dense(4 * 4 * 32, activation='relu')(latent_input)
         out = Reshape([4, 4, 32])(out)
         out = g_block(out, latent, 32)
@@ -209,15 +227,15 @@ class styleGAN():
         noise = np.random.normal(0, 1, (rows * cols, self.latent_size))
         gen_imgs = self.generator.predict(noise)
         gen_imgs = 0.5 * gen_imgs + 0.5  # 复原像素值
-        r1=np.concatenate(gen_imgs[:4],axis=1)
-        r2=np.concatenate(gen_imgs[4:8],axis=1)
-        r3=np.concatenate(gen_imgs[8:12],axis=1)
-        r4=np.concatenate(gen_imgs[12:16],axis=1)
-        all_mat=np.concatenate([r1,r2,r3,r4],axis=0)
-        image=preprocessing.image.array_to_img(all_mat)
+        r1 = np.concatenate(gen_imgs[:4], axis=1)
+        r2 = np.concatenate(gen_imgs[4:8], axis=1)
+        r3 = np.concatenate(gen_imgs[8:12], axis=1)
+        r4 = np.concatenate(gen_imgs[12:16], axis=1)
+        all_mat = np.concatenate([r1, r2, r3, r4], axis=0)
+        image = preprocessing.image.array_to_img(all_mat)
         image.save('./gen_img/{}.jpg'.format(epoch))
 
 
 if __name__ == '__main__':
     stylegan = styleGAN(log_path='./log.txt')
-    stylegan.train(epochs=10000, batch_size=batch_size, sample_interval=100)
+    stylegan.train(epochs=200000, batch_size=batch_size, sample_interval=100)
