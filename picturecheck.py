@@ -18,4 +18,4 @@ with open('log.txt','w') as log:
         if is_valid(path+file):
             1 + 1
         else:
-            log.write(file)
+            log.write(file+'\n')

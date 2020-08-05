@@ -1,7 +1,5 @@
 from PIL import Image
 import os
-import sys, getopt
-import tensorflow
 
 path = os.getcwd() + '/src_img/'
 save_path = os.getcwd() + '/resized_img'
@@ -17,4 +15,4 @@ for file in file_list:
         print('{1}:{0} SAVED'.format(file,str(total)))
     except Exception as e:
         print('{0} ERROR {1}'.format(file,e))
-        exit()
+print('Resized {0} Pics'.format(total))
