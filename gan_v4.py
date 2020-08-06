@@ -7,6 +7,7 @@ from keras.layers import *
 from keras.models import *
 from keras.optimizers import RMSprop
 from keras import preprocessing
+from keras.models import load_model
 from math import log2
 from PIL import Image
 import keras.backend as K
@@ -18,17 +19,6 @@ latent_size = 32
 batch_size = 20
 iterations = 50000
 n_layers = int(log2(img_size))
-
-
-def load_data():
-    file_list = os.listdir('./resized_img')
-    out = []
-    for file in file_list:
-        img = Image.open('./resized_img/{0}'.format(file)).convert('RGB')
-        data = np.reshape(np.array(img.getdata()), (img_size, img_size, 3))
-        out.append(data)
-    print('Load {0} Pics'.format(len(out)))
-    return np.array(out)
 
 
 class ImageFlow:
@@ -106,10 +96,11 @@ class styleGAN():
         self.optimizers = RMSprop(lr=0.00005)
         self.log = open(log_path, 'w')
 
-        self.generator = self.build_generator()
+        if self.load_model_from_disk() == False:
+            self.generator = self.build_generator()
+            self.discriminator = self.build_discriminator()
         print('Generator : ')
         self.generator.summary()
-        self.discriminator = self.build_discriminator()
         print('Discriminator : ')
         self.discriminator.summary()
 
@@ -227,6 +218,23 @@ class styleGAN():
         all_mat = np.concatenate([r1, r2, r3, r4], axis=0)
         image = preprocessing.image.array_to_img(all_mat)
         image.save('./gen_img/{}.jpg'.format(epoch))
+
+    def load_model_from_disk(self):
+        if os.path.exists('./model/generator.h5') and os.path.exists('./model/discriminator.h5'):
+            try:
+                print('Models Found')
+                self.generator=load_model('./model/generator.h5')
+                self.discriminator=load_model('./model/discriminator.h5')
+                print('Models Loaded')
+                self.log.write('Models Loaded\n')
+                return True
+            except:
+                print('Cannot load models. Then Created')
+                self.log.write('New models\n')
+                return False
+        print('Created new models')
+        self.log.write('New models\n')
+        return False
 
 
 if __name__ == '__main__':
