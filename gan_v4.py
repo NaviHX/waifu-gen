@@ -231,4 +231,4 @@ class styleGAN():
 
 if __name__ == '__main__':
     stylegan = styleGAN(log_path='./log.txt')
-    stylegan.train(epochs=200000, batch_size=batch_size, sample_interval=100)
+    stylegan.train(epochs=25000, batch_size=batch_size, sample_interval=100)
