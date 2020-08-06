@@ -41,7 +41,9 @@ class ImageFlow:
         idx = np.random.randint(0, self.amount, batch_size)
         out = []
         for i in idx:
-            img = Image.open(os.getcwd()+'/resized_img/{0}'.format(self.image_list[i])).convert('RGB')
+            img = Image.open(
+                os.getcwd() +
+                '/resized_img/{0}'.format(self.image_list[i])).convert('RGB')
             data = np.reshape(np.array(img.getdata()), (img_size, img_size, 3))
             out.append(data)
         return np.array(out)
@@ -82,15 +84,6 @@ def noise(batch_size, latent_size):
                                             latent_size]).astype(float)
 
 
-def noise_list(batch_size, n_layers, latent_size):
-    return [noise(batch_size, latent_size)] * n_layers
-
-
-def random_weighted_average(imgs):
-    alpha = K.random_uniform((32, 1, 1, 1))
-    return (alpha * imgs[0]) + ((1 - alpha) * imgs[1])
-
-
 def gradient_penalty(real_img, fake_img, averaged_samples):
     gradients = K.gradients(fake_img, averaged_samples)[0]
     gradients_sqr = K.square(gradients)
@@ -109,7 +102,7 @@ class styleGAN():
         self.lr = lr
         self.latent_size = latent_size
         self.img_size = img_size
-        self.img_path=img_path
+        self.img_path = img_path
         self.optimizers = RMSprop(lr=0.00005)
         self.log = open(log_path, 'w')
 
@@ -154,7 +147,7 @@ class styleGAN():
         # x_train = load_data()
         # x_train = (x_train.astype(np.float32) - 127.5) / 127.5
 
-        x_train=ImageFlow()
+        x_train = ImageFlow()
 
         real_out = np.ones([batch_size, 1])
         fake_out = np.zeros([batch_size, 1])
@@ -163,7 +156,7 @@ class styleGAN():
         for epoch in range(epochs):
             # idx = np.random.randint(0, x_train.shape[0], batch_size)
             # data=x_train[idx]
-            data = x_train.get(batch_size=batch_size)
+            data = (x_train.get(batch_size=batch_size) - 127.5) / 127.5
             z = noise(batch_size=batch_size, latent_size=latent_size)
             d_loss = self.d_train_model.train_on_batch(
                 [data, z], [real_out, fake_out, gp_out])
@@ -173,7 +166,7 @@ class styleGAN():
                     'Epoch {0}\nDiscriminator Loss : {1:.4f}\nGenerator Loss : {2:.4f}'
                     .format(epoch, d_loss[0], g_loss))
                 self.log.write(
-                    'Epoch {0}\nDiscriminator Loss : {1:.4f}\nGenerator Loss : {2:.4f}'
+                    'Epoch {0}\nDiscriminator Loss : {1:.4f}\nGenerator Loss : {2:.4f}\n'
                     .format(epoch, d_loss[0], g_loss))
                 self.log.flush()
                 sample_img = self.generator.predict(
@@ -185,7 +178,7 @@ class styleGAN():
         time_end = datetime.datetime.now()
         print('训练结束时间 : {0}'.format(time_end))
         print('训练耗时 : {0}'.format(time_end - time_start))
-        self.log.write('End at : {0}\nTime cost : {1}'.format(time_end -
+        self.log.write('End at : {0}\nTime cost : {1}\n'.format(time_end -
                                                               time_start))
 
     def build_generator(self):
