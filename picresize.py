@@ -9,7 +9,7 @@ for file in file_list:
     try:
         pic = path + file
         img = Image.open(pic)
-        img = img.resize((32, 32))
+        img = img.resize((128, 128))
         total+=1
         img.save('{0}/{1}.jpg'.format(save_path,str(total)))
         print('{1}:{0} SAVED'.format(file,str(total)))
